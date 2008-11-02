@@ -36,19 +36,19 @@ public class MachineTester extends Cobject {
           if (debug) System.out.println( "DEBUG:" + me2.getUUID() );
           if (debug) System.out.println( "DEBUG:" + me3.getUUID() );
 
+          // writing root object with uuid 00000...0000, if it exists then only update it.
           ObjectSet sett;
           sett = db.load_by_uuid( root.getUUID() );
           if (sett.hasNext()) {
               Cobject mee = (Cobject)sett.next();
               //store or update an object
-              db.save( mee ); // query by example by default
+              db.save( mee ); 
           } else { //else save root object
               db.save( root );
           }
           db.save( me2 );
           if (debug) System.out.println( "\nDEBUG: OBJECT TYPE => " + me3.getObjectType() );
           db.save( me3 );
-          player.setObjectType( Csoul.class );
           if (debug) System.out.println( "\nDEBUG: OBJECT TYPE => " + player.getObjectType() );
           db.save( player );
 
@@ -64,7 +64,7 @@ public class MachineTester extends Cobject {
               System.out.print( nextOne.getParent() + " @ ");
               System.out.println( nextOne.getCreatedAt().toString() );
               if ( nextOne.getObjectType() == Csoul.class ) {
-                    if (debug) System.out.println( "DEBUG: SOUL! Yeah! => " + nextOne.getUUID() );
+                    if (debug) System.out.println( "DEBUG: SOUL! => " + nextOne.getUUID() );
               }
           }
 
@@ -76,6 +76,9 @@ public class MachineTester extends Cobject {
               System.out.print( nextOne.getUUID() + " < ");
               System.out.print( nextOne.getParent() + " @ ");
               System.out.println( nextOne.getCreatedAt().toString() );
+              if ( nextOne.getObjectType() == Csoul.class ) {
+                    if (debug) System.out.println( "DEBUG: SOUL! => " + nextOne.getUUID() );
+              }
           }
         db.closeConnectionToDb();
 
