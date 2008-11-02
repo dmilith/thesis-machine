@@ -8,9 +8,8 @@ package thesis.machine;
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
-import java.util.UUID;
-import java.util.List;
 import com.db4o.query.Predicate;
+import java.util.UUID;
 
 import thesis.core.Cobject;
 
@@ -46,13 +45,25 @@ public class ObjectIO extends Cobject {
     }
 
     // native load by uuid
-    public ObjectSet load( final UUID uuid ) {
-        ObjectSet objects = db.query( new Predicate<Cobject>() {
-          public boolean match(Cobject object) {
-              return object.getUUID() == uuid;
-          }
-        });
-        return objects;
+    public ObjectSet load_by_uuid( final UUID uuid ) {
+        if (!connected) return null;
+          ObjectSet objects = db.query( new Predicate<Cobject>() {
+            public boolean match(Cobject object) {
+                return object.getUUID().equals( uuid );
+            }
+          });
+          return objects;
+    }
+
+    // native load by uuid
+    public ObjectSet load_by_parent( final UUID parent ) {
+        if (!connected) return null;
+          ObjectSet objects = db.query( new Predicate<Cobject>() {
+            public boolean match(Cobject object) {
+                return object.getParent().equals( parent );
+            }
+          });
+          return objects;
     }
 
     /*
@@ -61,25 +72,6 @@ public class ObjectIO extends Cobject {
     public ObjectSet load( Cobject match ) {
         if (!connected) return null;
             ObjectSet results = db.queryByExample( match );
-            if (debug) System.out.println( "DEBUG: Loaded Object" );
-            return results;
-    }
-
-    public ObjectSet load( Cobject match, int type ) {
-        if (!connected) return null;
-            ObjectSet results;
-            switch (type) {
-                case 0: {
-                    // Query By Example
-                    results = db.queryByExample( match );
-                    break;
-                }
-                case 1: {
-                    // not implemented yet
-                }
-                default:
-                    results = null;
-            }
             if (debug) System.out.println( "DEBUG: Loaded Object" );
             return results;
     }
