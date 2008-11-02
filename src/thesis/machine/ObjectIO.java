@@ -8,6 +8,9 @@ package thesis.machine;
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
+import java.util.UUID;
+import java.util.List;
+import com.db4o.query.Predicate;
 
 import thesis.core.Cobject;
 
@@ -21,6 +24,10 @@ public class ObjectIO extends Cobject {
     private ObjectContainer db;
     private boolean connected = false;
 
+
+    public ObjectContainer getDb() {
+        return db;
+    }
 
     public void createConnectionToDb( String filename ) {
         db = Db4o.openFile( filename );
@@ -36,6 +43,16 @@ public class ObjectIO extends Cobject {
         if (!connected) return;
             db.set( myobj );
             if (debug) System.out.println( "DEBUG: Stored " + myobj );
+    }
+
+    // native load by uuid
+    public ObjectSet load( final UUID uuid ) {
+        ObjectSet objects = db.query( new Predicate<Cobject>() {
+          public boolean match(Cobject object) {
+              return object.getUUID() == uuid;
+          }
+        });
+        return objects;
     }
 
     /*
