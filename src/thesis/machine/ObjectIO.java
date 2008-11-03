@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package thesis.machine;
 
 import com.db4o.Db4o;
@@ -59,7 +54,7 @@ public class ObjectIO extends Cobject {
    /**
      * native load Cobject by uuid
      */
-    public ObjectSet load_by_uuid( final UUID uuid ) {
+    public ObjectSet loadByUUID( final UUID uuid ) {
         if (!connected) return null;
           ObjectSet objects = db.query( new Predicate<Cobject>() {
             public boolean match(Cobject object) {
@@ -72,11 +67,28 @@ public class ObjectIO extends Cobject {
    /**
      * native load Cobject (or list of Cobjects) by uuid of parent
      */
-    public ObjectSet load_by_parent( final UUID parent ) {
+    public ObjectSet loadByParent( final UUID parent ) {
         if (!connected) return null;
           ObjectSet objects = db.query( new Predicate<Cobject>() {
             public boolean match(Cobject object) {
-                return object.getParent().equals( parent );
+                return object.getParent() == ( parent );
+            }
+          });
+          return objects;
+    }
+
+    public Cobject findNewestVersion( ObjectSet anObject ) {
+        return null;
+    }
+
+   /**
+     * native load Cobject (or list of Cobjects) by uuid of parent
+     */
+    public ObjectSet loadByType( final Cobject parent ) {
+        if (!connected) return null;
+          ObjectSet objects = db.query( new Predicate<Cobject>() {
+            public boolean match(Cobject object) {
+                return object.getClass().equals( parent.getClass() );
             }
           });
           return objects;
