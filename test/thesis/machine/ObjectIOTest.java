@@ -7,6 +7,7 @@ package thesis.machine;
 
 import thesis.core.*;
 import com.db4o.ObjectSet;
+import com.db4o.ObjectContainer;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -93,7 +94,18 @@ public class ObjectIOTest {
      * Test of closeConnectionToDb method, of class ObjectIO.
      */
     @Test
-    public void testCloseConnectionToDb() {
+    public void testDatabaseTransaction() {
+        ObjectContainer test = myobj.getDb();
+        
+    }
+
+    /**
+     * Test of objectCount method, of class ObjectIO.
+     */
+    @Test
+    public void testObjectCount() {
+        assertTrue( myobj.objectCount() > 3 );
+        System.out.println( "\n\n\nObjects in database: " + myobj.objectCount() );
     }
 
     /**
@@ -108,10 +120,10 @@ public class ObjectIOTest {
     }
 
     /**
-     * Test of load_by_uuid method, of class ObjectIO.
+     * Test of loadByUUID method, of class ObjectIO.
      */
     @Test
-    public void testLoad_by_uuid() {
+    public void testLoadByUUID() {
         System.out.println("load_by_uuid");
         ObjectSet sett;
         sett = myobj.loadByUUID( player.getUUID() );
@@ -129,10 +141,10 @@ public class ObjectIOTest {
     }
 
     /**
-     * Test of load_by_parent method, of class ObjectIO.
+     * Test of loadByParent method, of class ObjectIO.
      */
     @Test
-    public void testLoad_by_parent() {
+    public void testLoadByParent() {
         System.out.println("load_by_parent");
         ObjectSet sett;
         sett = myobj.loadByParent( player.getUUID() );
@@ -149,12 +161,46 @@ public class ObjectIOTest {
     }
 
     /**
+     * Test of loadAll method, of class ObjectIO.
+     */
+    @Test
+    public void testLoadAll() {
+        System.out.println("load_by_parent");
+        ObjectSet sett = myobj.loadByType( root );
+        assertTrue( sett.size() > 0 );
+        while (sett.hasNext()) {
+           Cobject mee = (Cobject)sett.next();
+              System.out.println( "DEBUG:GOT-> RC" + mee.getClass() + ", TC" + mee.getObjectType() + ", #" +
+                   mee.getUUID() + ", %"  + mee.getParent() + ", @" + mee.getCreatedAt() );
+              assertEquals( mee.getClass(), mee.getObjectType() );
+              assertNotNull( mee.getCreatedAt() );
+              assertNotNull( mee.getObjectType() );
+              assertNotNull( mee.getUUID() );
+              assertNotNull( mee.getParent() );
+        }
+    }
+
+    /**
      * Test of load method, of class ObjectIO.
      */
     @Test
-    public void testLoad() {
+    public void testLoadByType() {
         System.out.println("load");
           System.out.println( "\nDEBUG: Getting all objects:" );
+
+            ObjectSet sett;
+            sett = myobj.loadByType( root );
+            while (sett.hasNext()) {
+              Cobject mee = (Cobject)sett.next();
+              assertNotNull( mee.getClass() );
+              System.out.println( "DEBUG:GOT-> RC-" + mee.getClass() + ",TC-" + mee.getObjectType() + ", #-" +
+                    mee.getUUID() + ", %-"  + mee.getParent() + ", @-" + mee.getCreatedAt() );
+              assertNotNull( mee.getCreatedAt() );
+              assertNotNull( mee.getObjectType() );
+              assertNotNull( mee.getUUID() );
+              assertNotNull( mee.getParent() );
+            }
+
             ObjectSet sett2;
             sett2 = myobj.loadByType( player );
             while (sett2.hasNext()) {
@@ -165,7 +211,7 @@ public class ObjectIOTest {
               assertNotNull( mee.getObjectType() );
               assertNotNull( mee.getUUID() );
               assertNotNull( mee.getParent() );
-          }
+            }
 
 
     }
