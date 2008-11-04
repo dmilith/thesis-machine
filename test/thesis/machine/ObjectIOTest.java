@@ -100,15 +100,6 @@ public class ObjectIOTest {
     }
 
     /**
-     * Test of objectCount method, of class ObjectIO.
-     */
-    @Test
-    public void testObjectCount() {
-        assertTrue( myobj.objectCount() > 3 );
-        System.out.println( "\n\n\nObjects in database: " + myobj.objectCount() );
-    }
-
-    /**
      * Test of save method, of class ObjectIO.
      */
     @Test
@@ -216,5 +207,13 @@ public class ObjectIOTest {
 
     }
 
+    /**
+     * Test of objectCount method, of class ObjectIO.
+     */
+    @Test
+    public void testObjectCount() {
+        assertTrue( myobj.objectCount() > 3 );
+        System.out.println( "\n\n\nObjects in database: " + myobj.objectCount() );
+    }
 
 }
