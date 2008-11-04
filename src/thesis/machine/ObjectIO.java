@@ -77,6 +77,7 @@ public class ObjectIO extends Cobject {
           return objects;
     }
 
+    // TODO find best algorithm for finding newest object version
     public Cobject findNewestVersion( ObjectSet anObject ) {
         return null;
     }
@@ -95,13 +96,17 @@ public class ObjectIO extends Cobject {
     }
 
    /**
-     * load() will ask db4o for objects with specified type
+     * objectCount() will return amount of objects in database
      */
-    public ObjectSet load( Cobject match ) {
-        if (!connected) return null;
-          ObjectSet results = db.queryByExample( match );
-          if (debug) System.out.println( "DEBUG: Loaded Object" );
-          return results;
+    public int objectCount() {
+        if (!connected) return -1;
+          ObjectSet results = db.queryByExample( new Cobject( false ) );
+          int count = 0;
+          while (results.hasNext()) {
+              results.next();
+              ++count;
+          }
+          return count;
     }
 
 }
