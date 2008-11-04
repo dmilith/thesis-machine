@@ -101,12 +101,7 @@ public class ObjectIO extends Cobject {
     public int objectCount() {
         if (!connected) return -1;
           ObjectSet results = db.queryByExample( new Cobject( false ) );
-          int count = 0;
-          while (results.hasNext()) {
-              results.next();
-              ++count;
-          }
-          return count;
+          return results.size();
     }
 
 }
