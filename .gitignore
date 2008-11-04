@@ -1,6 +1,7 @@
 my_test*
 my_body*
 nbproject/
-build/*
+build/
 *properties*
+dist/
 
