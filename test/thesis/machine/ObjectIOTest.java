@@ -16,6 +16,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import thesis.core.Cobject;
 import thesis.core.Csoul;
+import java.util.UUID;
 
 /**
  *
@@ -24,6 +25,7 @@ import thesis.core.Csoul;
 public class ObjectIOTest {
 
     private ObjectIO myobj;
+    private Ccore core;
     private Cobject root;
     private Csoul player;
     private Cbody body, body2;
@@ -49,6 +51,9 @@ public class ObjectIOTest {
             "11111111-1111-1111-1111-111111111111" // parent UUID
             );
 
+        core = new Ccore(); // core object will contain current world settings
+        core.setParent( root.getUUID() );
+
         player = new Csoul();
         player.setMana( 10 );
         player.setParent( root.getUUID() );
@@ -63,12 +68,27 @@ public class ObjectIOTest {
 
         System.out.println("saving root");
         myobj.save( root );
+
+        Cobject root2 = new Cobject();
+        root2.setUUID ( root.getUUID() );
+
+        System.out.println("saving root2");
+        myobj.save( root2 );
+
+        System.out.println("saving core");
+        myobj.save( core );
         System.out.println("saving player");
         myobj.save( player );
         System.out.println("saving body2");
         myobj.save( body );
         System.out.println("saving body2");
         myobj.save( body2 );
+
+        System.out.println( "saving newest Cobject");
+        Cobject z = new Cobject();
+        z.setUUID( "550e8400-e29b-41d4-a716-446655440000" );
+        myobj.save( z );
+        
     }
 
     @After
@@ -126,9 +146,20 @@ public class ObjectIOTest {
               assertNotNull( mee.getCreatedAt() );
               assertNotNull( mee.getObjectType() );
               assertNotNull( mee.getUUID() );
-              assertNotNull( mee.getParent() );
         }
-        assertEquals(sett.size(), 1);
+        assertTrue(sett.size() == 1);
+
+        sett = myobj.loadByUUID( root.getUUID() );
+        while (sett.hasNext()) {
+           Cobject mee = (Cobject)sett.next();
+              System.out.println( "DEBUG:GOT-> RC" + mee.getClass() + ", TC" + mee.getObjectType() + ", #" +
+                   mee.getUUID() + ", %"  + mee.getParent() + ", @" + mee.getCreatedAt() );
+              assertEquals( mee.getClass(), mee.getObjectType() );
+              assertNotNull( mee.getCreatedAt() );
+              assertNotNull( mee.getObjectType() );
+              assertNotNull( mee.getUUID() );
+        }
+        assertTrue(sett.size() > 1);
     }
 
     /**
@@ -167,7 +198,6 @@ public class ObjectIOTest {
               assertNotNull( mee.getCreatedAt() );
               assertNotNull( mee.getObjectType() );
               assertNotNull( mee.getUUID() );
-              assertNotNull( mee.getParent() );
         }
     }
 
@@ -178,7 +208,6 @@ public class ObjectIOTest {
     public void testLoadByType() {
         System.out.println("load");
           System.out.println( "\nDEBUG: Getting all objects:" );
-
             ObjectSet sett;
             sett = myobj.loadByType( root );
             while (sett.hasNext()) {
@@ -189,9 +218,7 @@ public class ObjectIOTest {
               assertNotNull( mee.getCreatedAt() );
               assertNotNull( mee.getObjectType() );
               assertNotNull( mee.getUUID() );
-              assertNotNull( mee.getParent() );
             }
-
             ObjectSet sett2;
             sett2 = myobj.loadByType( player );
             while (sett2.hasNext()) {
@@ -201,13 +228,37 @@ public class ObjectIOTest {
               assertNotNull( mee.getCreatedAt() );
               assertNotNull( mee.getObjectType() );
               assertNotNull( mee.getUUID() );
-              assertNotNull( mee.getParent() );
             }
-
-
     }
 
     /**
+     * Test of objectCount method, of class ObjectIO.
+     */
+    @Test
+    public void testFindNewestVersionByType() {
+        System.out.println( "\n\n\n\n**************************************************\n" +
+                             myobj.loadOneByTypeWithNewestVersion( new Cobject( false )).getCreatedAt() );
+        assertEquals( UUID.fromString( "550e8400-e29b-41d4-a716-446655440000" ),
+                             myobj.loadOneByTypeWithNewestVersion( new Cobject( false )).getUUID() );
+    }
+
+    /**
+     * Test of objectCount method, of class ObjectIO.
+     */
+    @Test
+    public void testFindNewestVersionByUUID() {
+        System.out.println( "\n\n\n\n**************************************************\n" +
+                             myobj.loadOneByUUIDWithNewestVersion( root ) );
+        ObjectSet z = myobj.loadByUUID( root.getUUID() );
+        assertTrue( z.size() > 1 );
+        while ( z.hasNext() ) {
+            Cobject zz = ((Cobject)z.next());
+            System.out.println( zz.getUUID() );
+            assertNotNull( zz );
+        }
+    }
+
+   /**
      * Test of objectCount method, of class ObjectIO.
      */
     @Test
@@ -215,5 +266,5 @@ public class ObjectIOTest {
         assertTrue( myobj.objectCount() > 3 );
         System.out.println( "\n\n\nObjects in database: " + myobj.objectCount() );
     }
-
+    
 }

@@ -5,6 +5,7 @@ import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 import com.db4o.query.Predicate;
 import java.util.UUID;
+import java.util.Vector;
 
 import thesis.core.*;
 
@@ -35,6 +36,14 @@ public class ObjectIO extends Cobject {
     }
 
    /**
+     * creates connection to db4o
+     */
+    public void createConnectionToRemoteDb( String location, int port ) {
+       // db = Db4o.openServer(  );
+        connected = true;
+    }
+
+   /**
      * closing connection to db4o
      */
     public void closeConnectionToDb() {
@@ -61,6 +70,7 @@ public class ObjectIO extends Cobject {
                 return object.getUUID().equals( uuid );
             }
           });
+          if (debug) System.out.println( objects );
           return objects;
     }
 
@@ -77,9 +87,42 @@ public class ObjectIO extends Cobject {
           return objects;
     }
 
-    // TODO find best algorithm for finding newest object version
-    public Cobject findNewestVersion( ObjectSet anObject ) {
-        return null;
+    public Cobject loadOneByTypeWithNewestVersion( final Cobject parent ) {
+        if (!connected) return null;
+          ObjectSet objects = db.query( new Predicate<Cobject>() {
+            public boolean match(Cobject object) {
+                return object.getClass().equals( parent.getClass() );
+            }
+          });
+          long value = 0;
+          Cobject finalObject = null;
+          while (objects.hasNext()) {
+            Cobject newer = (Cobject)objects.next();
+            if ( newer.getCreatedAt().getTime() > value ) {
+                finalObject = newer;
+                value = newer.getCreatedAt().getTime();
+            }
+          }
+          return finalObject;
+    }
+
+    public Cobject loadOneByUUIDWithNewestVersion( final Cobject parent ) {
+        if (!connected) return null;
+          ObjectSet objects = db.query( new Predicate<Cobject>() {
+            public boolean match(Cobject object) {
+                return object.getUUID().equals( parent.getUUID() );
+            }
+          });
+          long value = 0;
+          Cobject finalObject = null;
+          while (objects.hasNext()) {
+            Cobject newer = (Cobject)objects.next();
+            if ( newer.getCreatedAt().getTime() > value ) {
+                finalObject = newer;
+                value = newer.getCreatedAt().getTime();
+            }
+          }
+          return finalObject;
     }
 
    /**
