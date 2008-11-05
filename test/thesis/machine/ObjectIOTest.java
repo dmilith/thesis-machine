@@ -57,8 +57,7 @@ public class ObjectIOTest implements ServerConfiguration {
         player.setParent( root.getUUID() );
 
         body = new Cbody();
-        body.setSoul( player ); // TODO: it should automaticly set player as parent
-        body.setParent( player.getUUID() );
+        body.setSoul( player ); 
 
         body2 = new Cbody(); // we want two bodies! ;>
         body2.setSoul( player );
@@ -105,6 +104,7 @@ public class ObjectIOTest implements ServerConfiguration {
         assertEquals(body.getParent(), player.getUUID());
         assertEquals(body2.getParent(), player.getUUID());
         assertEquals(body.getSoul(), player);
+        assertTrue( body.getParent().equals( player.getUUID() ) );
     }
 
     /**
