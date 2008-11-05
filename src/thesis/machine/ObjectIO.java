@@ -5,7 +5,6 @@ import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 import com.db4o.query.Predicate;
 import java.util.UUID;
-import java.util.Vector;
 
 import thesis.core.*;
 
