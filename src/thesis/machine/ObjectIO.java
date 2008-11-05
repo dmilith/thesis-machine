@@ -11,6 +11,7 @@ import thesis.core.*;
 /**
  *
  * @author Daniel <dmilith> Dettlaff
+ * @version 0.0.3
  */
 public class ObjectIO extends Cobject implements ServerConfiguration {
 

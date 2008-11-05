@@ -1,7 +1,8 @@
-my_test*
-my_body*
 nbproject/
 build/
 *properties*
 dist/
+main*.db4o
+manifest.mf
+lib/nblib*
 
