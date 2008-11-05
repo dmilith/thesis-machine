@@ -18,6 +18,10 @@ public interface ServerConfiguration {
     */
     public String DBFILE = "main.db4o";
     /**
+    * the database file to be used locally
+    */
+    public String LOCAL_DBFILE = "main_local.db4o";
+    /**
     * the port to be used by the server.
     */
     public int PORT = 60708;
