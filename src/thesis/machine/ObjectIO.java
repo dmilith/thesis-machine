@@ -13,7 +13,7 @@ import thesis.core.*;
  *
  * @author Daniel <dmilith> Dettlaff
  */
-public class ObjectIO extends Cobject {
+public class ObjectIO extends Cobject implements ServerConfiguration {
 
     // directly access to ObjectContainer class from ObjectIO
     private ObjectContainer db;
@@ -31,24 +31,39 @@ public class ObjectIO extends Cobject {
      * creates connection to db4o
      */
     public void createConnectionToDb( String filename ) {
-        db = Db4o.openFile( filename );
-        connected = true;
+        try {
+            db = Db4o.openFile( filename );
+            connected = true;
+        } catch (Exception e ) {
+            System.out.println( e.getStackTrace() );
+            connected = false;
+        }
     }
 
    /**
      * creates connection to db4o
      */
     public void createConnectionToRemoteDb( String location, int port ) {
-       // db = Db4o.openServer(  );
-        connected = true;
+        try {
+            // connect to the server
+            db = Db4o.openClient( HOST, PORT, USER, PASS );
+            connected = true;
+        } catch (Exception e) {
+            // e.printStackTrace();
+             System.out.println( "\n* connection refused or database server is down.\n* will use local storage." );
+             createConnectionToDb( LOCAL_DBFILE );
+             connected = true;
+        }
     }
 
    /**
      * closing connection to db4o
      */
     public void closeConnectionToDb() {
-        db.close();
-        connected = false;
+        if ( connected ) {
+            connected = false;
+            db.close();
+        }
     }
 
    /**
@@ -56,7 +71,7 @@ public class ObjectIO extends Cobject {
      */
     public void save( Cobject myobj ) {
         if (!connected) return;
-          db.set( myobj );
+          db.store( myobj );
           if (debug) System.out.println( "DEBUG: Stored " + myobj );
     }
 
@@ -143,7 +158,7 @@ public class ObjectIO extends Cobject {
      */
     public int objectCount() {
         if (!connected) return -1;
-          ObjectSet results = db.queryByExample( new Cobject( false ) );
+          ObjectSet results = this.loadByType( new Cobject( false ) ); //queryByExample( new Cobject( false ) );
           return results.size();
     }
 
