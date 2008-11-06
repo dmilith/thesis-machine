@@ -15,6 +15,8 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import thesis.core.Cobject;
 import thesis.core.Csoul;
+import java.util.Vector;
+import java.util.Date;
 
 /**
  *
@@ -23,12 +25,15 @@ import thesis.core.Csoul;
 public class ObjectIOTest implements ServerConfiguration {
 
     private ObjectIO myobj;
+    private Vector<Ccoordinates> coord = new Vector<Ccoordinates>(90);
     private Ccore core;
-    private Cobject root;
+    private Cobject root, root2;
     private Csoul player;
     private Cbody body, body2;
 
     public ObjectIOTest() {
+        myobj = new ObjectIO();
+        myobj.createConnectionToRemoteDb( HOST, PORT );
     }
 
     @BeforeClass
@@ -41,8 +46,6 @@ public class ObjectIOTest implements ServerConfiguration {
 
     @Before
     public void setUp() {
-        myobj = new ObjectIO();
-        myobj.createConnectionToRemoteDb( HOST, PORT );
 
         root = new Cobject(
             "00000000-0000-0000-0000-000000000000", // UUID
@@ -51,6 +54,11 @@ public class ObjectIOTest implements ServerConfiguration {
 
         core = new Ccore(); // core object will contain current world settings
         core.setParent( root.getUUID() );
+
+        for (int i = 0; i < 90; i++) {
+            coord.add( i, new Ccoordinates() );
+            myobj.save( coord.elementAt(i) );
+        }
 
         player = new Csoul();
         player.setMana( 10 );
@@ -63,25 +71,25 @@ public class ObjectIOTest implements ServerConfiguration {
         body2.setSoul( player );
         body2.setParent( player.getUUID() );
 
-        System.out.println("saving root");
+//        System.out.println("saving root");
         myobj.save( root );
 
-        Cobject root2 = new Cobject();
+        root2 = new Cobject();
         root2.setUUID ( root.getUUID() );
 
-        System.out.println("saving root2");
+//        System.out.println("saving root2");
         myobj.save( root2 );
 
-        System.out.println("saving core");
+      //  System.out.println("saving core");
         myobj.save( core );
-        System.out.println("saving player");
+    //    System.out.println("saving player");
         myobj.save( player );
-        System.out.println("saving body2");
+  //      System.out.println("saving body2");
         myobj.save( body );
-        System.out.println("saving body2");
+//        System.out.println("saving body2");
         myobj.save( body2 );
 
-        System.out.println( "saving newest Cobject");
+       // System.out.println( "saving newest Cobject");
         Cobject z = new Cobject();
         z.setParent( root.getUUID() );
         z.setUUID( "550e8400-e29b-41d4-a716-446655440000" );
@@ -92,8 +100,32 @@ public class ObjectIOTest implements ServerConfiguration {
 
     @After
     public void tearDown() {
-        myobj.closeConnectionToDb();
+        //myobj.closeConnectionToDb();
     }
+
+    /**
+     * Test of loadByUUID method, of class ObjectIO.
+     */
+    @Test
+    public void testAllUsingSODA() {
+       ObjectSet sett;
+       Date time_now = new Date();
+       sett = myobj.loadAllByDateUsingSODA( new Cobject( false ) );
+       Date time_after = new Date();
+       /* while (sett.hasNext()) {
+           Cobject mee = (Cobject)sett.next();
+              System.out.println( "DEBUG:GOT-> RC" + mee.getClass() + ", TC" + mee.getObjectType() + ", #" +
+                   mee.getUUID() + ", %"  + mee.getParent() + ", @" + mee.getCreatedAt() );
+              assertNotNull( mee.getCreatedAt() );
+              assertNotNull( mee.getObjectType() );
+              assertNotNull( mee.getUUID() );
+        }*/
+      System.out.println( "Przed: " + time_now.getTime() );
+      System.out.println( "Po: " + time_after.getTime() );
+      System.out.println( "CZAS w ms: " + ( time_after.getTime() - time_now.getTime() ) );
+      System.out.println( "\n\n\nObjects in database: " + myobj.objectCount() );
+    }
+
 
     /**
      * Test of save method, of class ObjectIO.
@@ -124,7 +156,7 @@ public class ObjectIOTest implements ServerConfiguration {
               assertNotNull( mee.getObjectType() );
               assertNotNull( mee.getUUID() );
         }
-        assertTrue(sett.size() > 1);
+        assertTrue(sett.size() >= 1);
     }
 
     /**
@@ -191,6 +223,7 @@ public class ObjectIOTest implements ServerConfiguration {
      */
     @Test
     public void testLoadAllPlayers() {
+            System.out.println( "Load all players" );
             ObjectSet sett2;
             sett2 = myobj.loadByType( player );
             while (sett2.hasNext()) {
@@ -230,7 +263,7 @@ public class ObjectIOTest implements ServerConfiguration {
         }
     }
 
-   /**
+    /**
      * Test of objectCount method, of class ObjectIO.
      */
     @Test
@@ -238,5 +271,5 @@ public class ObjectIOTest implements ServerConfiguration {
         assertTrue( myobj.objectCount() > 3 );
         System.out.println( "\n\n\nObjects in database: " + myobj.objectCount() );
     }
-    
+
 }
