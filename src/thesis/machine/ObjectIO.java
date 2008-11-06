@@ -1,6 +1,7 @@
 package thesis.machine;
 
 import com.db4o.Db4o;
+import com.db4o.query.*;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 import com.db4o.query.Predicate;
@@ -121,9 +122,25 @@ public class ObjectIO extends Cobject implements ServerConfiguration {
           return finalObject;
     }
 
+    public ObjectSet loadAllByDateUsingSODA( Cobject object ) {
+        Query query = db.query();
+        query.constrain( object.getClass() );
+        query.descend("createdAt").orderAscending();
+        ObjectSet result=query.execute();
+        return result;
+    }
+
+    public ObjectSet loadAllUsingSODA( Cobject object ) {
+        Query query = db.query();
+        query.constrain( object.getClass() );
+        ObjectSet result=query.execute();
+        return result;
+    }
+
     public Cobject loadOneByUUIDWithNewestVersion( final Cobject parent ) {
         if (!connected) return null;
           ObjectSet objects = db.query( new Predicate<Cobject>() {
+            @Override
             public boolean match(Cobject object) {
                 return object.getUUID().equals( parent.getUUID() );
             }
@@ -158,7 +175,7 @@ public class ObjectIO extends Cobject implements ServerConfiguration {
      */
     public int objectCount() {
         if (!connected) return -1;
-          ObjectSet results = this.loadByType( new Cobject( false ) ); //queryByExample( new Cobject( false ) );
+          ObjectSet results = this.loadAllByDateUsingSODA( new Cobject( false ) ); //queryByExample( new Cobject( false ) );
           return results.size();
     }
 
